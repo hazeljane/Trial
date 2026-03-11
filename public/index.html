@@ -5,22 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User or Admin Portal</title>
 <style>
-  /* ----- General ----- */
-  body { font-family: 'Segoe UI', sans-serif; background: #f2f6fc; color: #333; margin:0; padding:0; }
-  h1,h2 { text-align:center; margin-bottom:20px; }
-  .container { max-width:500px; margin:40px auto; padding:20px; background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); }
-  .role-btns { text-align:center; margin-bottom:30px; }
-  .role-btns button { background:#4b7bec; color:white; border:none; padding:12px 25px; margin:0 10px; border-radius:8px; font-size:16px; cursor:pointer; transition:0.3s; }
-  .role-btns button:hover { background:#3867d6; }
-  form { display:flex; flex-direction:column; gap:15px; }
-  input { padding:12px; border-radius:8px; border:1px solid #ccc; font-size:16px; }
-  input:focus { outline:none; border-color:#4b7bec; box-shadow:0 0 5px rgba(75,123,236,0.5); }
-  button[type="submit"] { background:#20bf6b; color:white; border:none; padding:12px; font-size:16px; border-radius:8px; cursor:pointer; }
-  button[type="submit"]:hover { background:#0fb97b; }
-  .page { display:none; margin-top:20px; }
-  #welcome,#message,#adminMessage { margin-top:15px; font-weight:bold; color:#20bf6b; text-align:center; }
-  #subscriberList { list-style:none; padding:0; margin-top:15px; }
-  #subscriberList li { background:#f1f2f6; padding:10px 15px; margin-bottom:10px; border-radius:8px; }
+body { font-family: 'Segoe UI', sans-serif; background: #f2f6fc; color: #333; margin:0; padding:0; }
+h1,h2 { text-align:center; margin-bottom:20px; }
+.container { max-width:500px; margin:40px auto; padding:20px; background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+.role-btns { text-align:center; margin-bottom:30px; }
+.role-btns button { background:#4b7bec; color:white; border:none; padding:12px 25px; margin:0 10px; border-radius:8px; font-size:16px; cursor:pointer; transition:0.3s; }
+.role-btns button:hover { background:#3867d6; }
+form { display:flex; flex-direction:column; gap:15px; }
+input { padding:12px; border-radius:8px; border:1px solid #ccc; font-size:16px; }
+input:focus { outline:none; border-color:#4b7bec; box-shadow:0 0 5px rgba(75,123,236,0.5); }
+button[type="submit"] { background:#20bf6b; color:white; border:none; padding:12px; font-size:16px; border-radius:8px; cursor:pointer; }
+button[type="submit"]:hover { background:#0fb97b; }
+.page { display:none; margin-top:20px; }
+#welcome,#message,#adminMessage { margin-top:15px; font-weight:bold; color:#20bf6b; text-align:center; }
+#subscriberList { list-style:none; padding:0; margin-top:15px; }
+#subscriberList li { background:#f1f2f6; padding:10px 15px; margin-bottom:10px; border-radius:8px; }
 </style>
 </head>
 <body>
@@ -58,93 +57,82 @@
 </div>
 
 <script>
-  // --- Show pages ---
-  const userBtn = document.getElementById('userBtn');
-  const adminBtn = document.getElementById('adminBtn');
-  const userPage = document.getElementById('userPage');
-  const adminPage = document.getElementById('adminPage');
+const userBtn = document.getElementById('userBtn');
+const adminBtn = document.getElementById('adminBtn');
+const userPage = document.getElementById('userPage');
+const adminPage = document.getElementById('adminPage');
 
-  userBtn.addEventListener('click', () => {
-    userPage.style.display = 'block';
-    adminPage.style.display = 'none';
-  });
+userBtn.addEventListener('click', () => {
+  userPage.style.display = 'block';
+  adminPage.style.display = 'none';
+});
+adminBtn.addEventListener('click', () => {
+  adminPage.style.display = 'block';
+  userPage.style.display = 'none';
+});
 
-  adminBtn.addEventListener('click', () => {
-    adminPage.style.display = 'block';
-    userPage.style.display = 'none';
-  });
+const subscribeForm = document.getElementById('subscribeForm');
+subscribeForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const message = document.getElementById('message');
+  const welcome = document.getElementById('welcome');
 
-  // --- Subscribe Form ---
-  const subscribeForm = document.getElementById('subscribeForm');
-  subscribeForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message');
-    const welcome = document.getElementById('welcome');
-
-    try {
-      // ✅ Use relative path for serverless function
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        welcome.textContent = `Welcome, ${name}!`;
-        message.textContent = data.message;
-      } else {
-        message.textContent = data.message;
-      }
-    } catch(err) {
-      message.textContent = "Server error";
-      console.error(err);
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, email })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      welcome.textContent = `Welcome, ${name}!`;
+      message.textContent = data.message;
+    } else {
+      message.textContent = data.message;
     }
-  });
+  } catch(err) {
+    message.textContent = "Server error";
+    console.error(err);
+  }
+});
 
-  // --- Admin Login Form ---
-  const loginForm = document.getElementById('loginForm');
-  loginForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const adminMessage = document.getElementById('adminMessage');
-    const subscriberList = document.getElementById('subscriberList');
+const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const adminMessage = document.getElementById('adminMessage');
+  const subscriberList = document.getElementById('subscriberList');
 
-    try {
-      // ✅ Use relative path for login
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      adminMessage.textContent = "Login successful!";
+
+      const subsRes = await fetch('/api/subscribers', {
+        headers: { 'Authorization': `Bearer ${data.token}` }
       });
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        adminMessage.textContent = "Login successful!";
-
-        // Fetch subscribers using the token
-        const subsRes = await fetch('/api/subscribers', {
-          headers: { 'Authorization': `Bearer ${data.token}` }
-        });
-        const subsData = await subsRes.json();
-
-        if (subsRes.ok) {
-          subscriberList.innerHTML = subsData.data
-            .map(s => `<li>${s.name} (${s.email})</li>`)
-            .join('');
-        } else {
-          adminMessage.textContent = subsData.message || "Failed to fetch subscribers";
-        }
+      const subsData = await subsRes.json();
+      if (subsRes.ok) {
+        subscriberList.innerHTML = subsData.data.map(s => `<li>${s.name} (${s.email})</li>`).join('');
       } else {
-        adminMessage.textContent = data.message || "Login failed";
+        adminMessage.textContent = subsData.message || "Failed to fetch subscribers";
       }
-    } catch(err) {
-      adminMessage.textContent = "Server error";
-      console.error(err);
+    } else {
+      adminMessage.textContent = data.message || "Login failed";
     }
-  });
+  } catch(err) {
+    adminMessage.textContent = "Server error";
+    console.error(err);
+  }
+});
 </script>
 </body>
 </html>
