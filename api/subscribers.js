@@ -1,20 +1,15 @@
 import jwt from 'jsonwebtoken';
 
-export const subscribers = []; // shared memory storage
+const admin = { username: 'admin', password: '1234' };
 
 export default function handler(req, res) {
-  if (req.method === 'GET') {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'No token provided' });
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
-    const token = authHeader.split(' ')[1];
-    try {
-      jwt.verify(token, process.env.JWT_SECRET || 'secret123');
-      res.status(200).json({ data: subscribers });
-    } catch {
-      res.status(403).json({ message: 'Invalid or expired token' });
-    }
+  const { username, password } = req.body;
+  if (username === admin.username && password === admin.password) {
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ success: true, token });
   } else {
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(401).json({ success: false, message: 'Invalid login' });
   }
 }
