@@ -84,7 +84,8 @@
     const welcome = document.getElementById('welcome');
 
     try {
-      const res = await fetch('http://localhost:3000/subscribe', {
+      // ✅ Use relative path for serverless function
+      const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email })
@@ -98,6 +99,7 @@
       }
     } catch(err) {
       message.textContent = "Server error";
+      console.error(err);
     }
   });
 
@@ -111,25 +113,36 @@
     const subscriberList = document.getElementById('subscriberList');
 
     try {
-      const res = await fetch('http://localhost:3000/login', {
+      // ✅ Use relative path for login
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-      if (data.success) {
+
+      if (res.ok && data.success) {
         adminMessage.textContent = "Login successful!";
-        // Fetch subscribers
-        const subsRes = await fetch('http://localhost:3000/subscribers', {
+
+        // Fetch subscribers using the token
+        const subsRes = await fetch('/api/subscribers', {
           headers: { 'Authorization': `Bearer ${data.token}` }
         });
         const subsData = await subsRes.json();
-        subscriberList.innerHTML = subsData.data.map(s => `<li>${s.name} (${s.email})</li>`).join('');
+
+        if (subsRes.ok) {
+          subscriberList.innerHTML = subsData.data
+            .map(s => `<li>${s.name} (${s.email})</li>`)
+            .join('');
+        } else {
+          adminMessage.textContent = subsData.message || "Failed to fetch subscribers";
+        }
       } else {
-        adminMessage.textContent = data.message;
+        adminMessage.textContent = data.message || "Login failed";
       }
     } catch(err) {
       adminMessage.textContent = "Server error";
+      console.error(err);
     }
   });
 </script>
