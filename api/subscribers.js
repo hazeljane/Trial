@@ -1,4 +1,3 @@
-// api/subscribers.js
 import clientPromise from "../mongo.js";
 import jwt from "jsonwebtoken";
 
@@ -13,10 +12,11 @@ export default async function handler(req, res) {
   const token = authHeader.split(" ")[1];
 
   try {
+    // Verify JWT token
     jwt.verify(token, process.env.JWT_SECRET);
 
     const client = await clientPromise;
-    const db = client.db("subscriberDB"); // match your MongoDB DB name
+    const db = client.db("subscriberDB");
 
     const subscribers = await db.collection("subscribers").find().toArray();
 
