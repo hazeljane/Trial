@@ -1,27 +1,20 @@
-import clientPromise from "../mongo.js";
+// api/subscribe.js
+const clientPromise = require('../mongo');
 
-export default async function handler(req, res) {
-  if (req.method !== "POST")
-    return res.status(405).json({ message: "Method Not Allowed" });
-
-  const { name, email } = req.body;
-
-  if (!name || !email)
-    return res.status(400).json({ message: "Name and email required" });
-
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
   try {
+    const { name, email } = req.body;
+    if (!name || !email) return res.status(400).json({ message: 'Missing name/email' });
+
     const client = await clientPromise;
-    const db = client.db("myDatabase");
+    const db = client.db('subscriberDB');
+    const collection = db.collection('subscribers');
 
-    const exists = await db.collection("subscribers").findOne({ email });
-
-    if (exists)
-      return res.status(400).json({ message: "Subscriber already exists" });
-
-    await db.collection("subscribers").insertOne({ name, email });
-
-    res.status(200).json({ message: `Thank you for subscribing, ${name}!` });
+    await collection.insertOne({ name, email, subscribedAt: new Date() });
+    res.status(200).json({ message: 'Subscribed successfully!' });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
-}
+};
