@@ -1,3 +1,4 @@
+// api/subscribers.js
 import clientPromise from "../mongo.js";
 import jwt from "jsonwebtoken";
 
@@ -6,7 +7,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
 
   const authHeader = req.headers.authorization;
-
   if (!authHeader)
     return res.status(401).json({ message: "No token provided" });
 
@@ -16,15 +16,13 @@ export default async function handler(req, res) {
     jwt.verify(token, process.env.JWT_SECRET);
 
     const client = await clientPromise;
-    const db = client.db("myDatabase");
+    const db = client.db("subscriberDB"); // match your MongoDB DB name
 
-    const subscribers = await db
-      .collection("subscribers")
-      .find()
-      .toArray();
+    const subscribers = await db.collection("subscribers").find().toArray();
 
     res.status(200).json({ data: subscribers });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(401).json({ message: "Invalid token" });
   }
 }

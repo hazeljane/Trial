@@ -1,3 +1,4 @@
+// api/login.js
 import jwt from "jsonwebtoken";
 
 const admin = { username: "admin", password: "1234" };
@@ -12,9 +13,8 @@ export default function handler(req, res) {
     const token = jwt.sign({ username }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-
-    res.status(200).json({ success: true, token });
-  } else {
-    res.status(401).json({ success: false, message: "Invalid login" });
+    return res.status(200).json({ success: true, token });
   }
+
+  return res.status(401).json({ success: false, message: "Invalid login" });
 }
