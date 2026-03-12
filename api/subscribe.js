@@ -1,4 +1,3 @@
-// api/subscribe.js
 const clientPromise = require('../mongo');
 
 module.exports = async (req, res) => {

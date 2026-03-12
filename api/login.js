@@ -1,4 +1,3 @@
-// api/login.js
 const jwt = require("jsonwebtoken");
 
 const admin = { username: "admin", password: "1234" };
