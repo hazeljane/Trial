@@ -1,4 +1,3 @@
-
 import jwt from "jsonwebtoken";
 
 const admin = { username: "admin", password: "1234" };
