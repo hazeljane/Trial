@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     jwt.verify(token, process.env.JWT_SECRET);
 
     const client = await clientPromise;
-    const db = client.db("subscriberDB");
+    const db = client.db("subscriberDB"); // match your MongoDB DB name
 
     const subscribers = await db.collection("subscribers").find().toArray();
 
