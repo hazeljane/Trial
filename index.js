@@ -1,26 +1,29 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');  // <-- needed for file paths
 
 const app = express();
 
-// ----- Define config directly here -----
+// ---- Config ----
 const PORT = 3000;
 const MONGO_URI = 'mongodb+srv://gunohazeljane:hazel_123@cluster0.4casr.mongodb.net/subscriberDB?retryWrites=true&w=majority';
-// If you use JWT in other routes, define secret too:
 const JWT_SECRET = 'mysecret123';
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));  // <-- serve files in public folder
 
 // Connect MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 
-// Test route
-app.get('/', (req, res) => res.send('Server running'));
+// Serve the HTML page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
